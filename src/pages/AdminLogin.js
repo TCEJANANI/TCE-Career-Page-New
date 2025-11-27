@@ -1,70 +1,55 @@
 // src/pages/AdminLogin.js
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { signInWithPopup, GoogleAuthProvider } from "firebase/auth";
+import { auth } from "../firebase";
 import "./AdminLogin.css";
+import collegeBg from "../assets/college-bg.jpeg"; // reuse same background
 
 export default function AdminLogin() {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
   const navigate = useNavigate();
+  const provider = new GoogleAuthProvider();
 
-  const handleLogin = async (e) => {
-    e.preventDefault();
+  const handleGoogleLogin = async () => {
     setError("");
     setLoading(true);
 
     try {
-      const resp = await fetch("http://localhost:5007/api/admin/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password }),
-      });
+      const result = await signInWithPopup(auth, provider);
+      const user = result.user;
 
-      const data = await resp.json();
+      const token = await user.getIdToken();
+      localStorage.setItem("tce_admin_token", token);
 
-      if (!resp.ok) {
-        setError(data.message || "Login failed");
-        return;
+      if (user.email.endsWith(".tce.edu")) {
+        navigate("/admin-dashboard");
+      } else {
+        navigate("/form");
       }
-
-      // Save JWT token
-      localStorage.setItem("tce_admin_token", data.token);
-
-      // Go to dashboard
-      navigate("/admin-dashboard");
     } catch (err) {
-      console.error("Login error:", err);
-      setError("Server error");
+      console.error(err);
+      setError("SSO login failed");
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="admin-login-container">
-      <h2>Admin Login</h2>
-      <form onSubmit={handleLogin} className="admin-login-form">
-        <input
-          type="email"
-          placeholder="Admin Email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          required
-        />
-        <input
-          type="password"
-          placeholder="Admin Password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          required
-        />
-        {error && <p className="error-text">{error}</p>}
-        <button type="submit" disabled={loading}>
-          {loading ? "Logging in..." : "Login"}
-        </button>
-      </form>
-    </div>
+    <header
+      className="hero"
+      style={{ backgroundImage: `url(${collegeBg})` }}
+    >
+      <div className="overlay">
+        <div className="hero-text">
+          <h2>Admin Login (Google SSO)</h2>
+          {error && <p className="error-text">{error}</p>}
+          <button onClick={handleGoogleLogin} disabled={loading}>
+            {loading ? "Signing in..." : "Login with Google"}
+          </button>
+        </div>
+      </div>
+    </header>
   );
 }
