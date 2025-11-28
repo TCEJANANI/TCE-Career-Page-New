@@ -423,7 +423,7 @@ function FormPage() {
               <p>
                 📄 Existing Resume:{" "}
                 <a
-                  href={`http://localhost:5007/api/resume/view/${formData.fileKey}`}
+                  href={`http://localhost:5007/api/resume/view/${encodeURIComponent(formData.fileKey)}`}
                   target="_blank"
                   rel="noopener noreferrer"
                 >
