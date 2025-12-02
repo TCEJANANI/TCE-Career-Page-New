@@ -301,6 +301,7 @@ function FormPage() {
                   type="text"
                   name="phdInstitute"
                   value={formData.phdInstitute}
+                  required
                   onChange={handleChange}
                 />
               </label>
@@ -311,6 +312,7 @@ function FormPage() {
                   type="text"
                   name="phdTopic"
                   value={formData.phdTopic}
+                  required
                   onChange={handleChange}
                 />
               </label>
@@ -343,6 +345,7 @@ function FormPage() {
                   type="text"
                   name="currentInstitution"
                   value={formData.currentInstitution}
+                  required
                   onChange={handleChange}
                 />
               </label>
@@ -353,6 +356,7 @@ function FormPage() {
                   type="text"
                   name="jobTitle"
                   value={formData.jobTitle}
+                  required
                   onChange={handleChange}
                 />
               </label>
@@ -363,6 +367,7 @@ function FormPage() {
                   type="number"
                   name="expAcademics"
                   value={formData.expAcademics}
+                  required
                   onChange={handleChange}
                 />
               </label>
@@ -373,6 +378,7 @@ function FormPage() {
                   type="number"
                   name="expIndustry"
                   value={formData.expIndustry}
+                  required
                   onChange={handleChange}
                 />
               </label>
@@ -383,6 +389,7 @@ function FormPage() {
                   type="number"
                   name="journals"
                   value={formData.journals}
+                  required
                   onChange={handleChange}
                 />
               </label>
@@ -393,6 +400,7 @@ function FormPage() {
                   type="number"
                   name="projects"
                   value={formData.projects}
+                  required
                   onChange={handleChange}
                 />
               </label>
@@ -405,6 +413,7 @@ function FormPage() {
                       type="radio"
                       name="placementIncharge"
                       value={option}
+                      required
                       checked={formData.placementIncharge === option}
                       onChange={handleChange}
                     />{" "}
@@ -436,6 +445,7 @@ function FormPage() {
               type="file"
               name="file"
               accept="application/pdf"
+              required
               onChange={handleChange}
             />
           </label>
