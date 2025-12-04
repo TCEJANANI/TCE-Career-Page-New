@@ -3,6 +3,9 @@ import { useNavigate } from "react-router-dom";
 import Navbar from "../components/Navbar";
 import "./FormPage.css";
 
+const API_BASE =
+  process.env.REACT_APP_API_URL || "https://tce-careerpage-cuml.onrender.com";
+
 function FormPage() {
   const navigate = useNavigate();
 
@@ -33,9 +36,7 @@ function FormPage() {
     file: null
   });
 
-  // -----------------------------
-  // HANDLE INPUT CHANGE
-  // -----------------------------
+  // Handle input change
   const handleChange = (e) => {
     const { name, value, files, type } = e.target;
 
@@ -45,40 +46,32 @@ function FormPage() {
     }));
   };
 
-  // -----------------------------
-  // PREFILL IF EMAIL EXISTS
-  // -----------------------------
+  // Prefill on email
   const handleEmailBlur = async () => {
     if (!formData.email) return;
 
     try {
-      const res = await fetch(`${process.env.REACT_APP_API_URL}/api/applications`, {
-  method: "POST",
-  body: formData
-});
+      const res = await fetch(`${API_BASE}/api/applications/email/${formData.email}`);
 
+      if (!res.ok) return; // no existing record, continue
 
-      if (res.ok) {
-        const data = await res.json();
+      const data = await res.json();
 
-        setFormData((prev) => ({
-          ...prev,
-          ...data,
-          id: data.id,
-          applicationId: data.applicationId,
-          file: null
-        }));
+      setFormData((prev) => ({
+        ...prev,
+        ...data,
+        id: data.id,
+        applicationId: data.applicationId,
+        file: null
+      }));
 
-        alert(`Existing application found! ID: ${data.applicationId}. You can update it.`);
-      }
-    } catch (error) {
-      console.error("Fetch existing application failed:", error);
+      alert(`Existing application found! ID: ${data.applicationId}. You can update it.`);
+    } catch (err) {
+      console.error("Prefill failed:", err);
     }
   };
 
-  // -----------------------------
-  // SUBMIT (INSERT OR UPDATE)
-  // -----------------------------
+  // Submit form
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -107,32 +100,28 @@ function FormPage() {
         "placementIncharge"
       ];
 
-      // append normal fields
       allowedFields.forEach((key) => {
-        const v = formData[key];
-        formPayload.append(key, v === null || v === undefined ? "" : v);
+        formPayload.append(key, formData[key] || "");
       });
 
-      // append file only if selected
       if (formData.file) {
         formPayload.append("file", formData.file);
       }
 
       let response;
 
-      // UPDATE ---------------------------------
       if (formData.id) {
+        // UPDATE
         response = await fetch(
-          `${process.env.REACT_APP_API_URL}/api/applications/id/${formData.id}`,
+          `${API_BASE}/api/applications/id/${formData.id}`,
           {
             method: "PUT",
             body: formPayload
           }
         );
-      }
-      // INSERT ---------------------------------
-      else {
-        response = await fetch(`${process.env.REACT_APP_API_URL}/api/applications`, {
+      } else {
+        // INSERT
+        response = await fetch(`${API_BASE}/api/applications`, {
           method: "POST",
           body: formPayload
         });
@@ -165,6 +154,7 @@ function FormPage() {
         <p className="required-note">* Indicates required question</p>
 
         <form onSubmit={handleSubmit} className="form-grid">
+
           {/* EMAIL */}
           <label>
             Email *
@@ -271,7 +261,7 @@ function FormPage() {
             />
           </label>
 
-          {/* Others */}
+          {/* Masters */}
           <label>
             Pursued Masters Degree in the Institute *
             <input
@@ -294,7 +284,7 @@ function FormPage() {
             />
           </label>
 
-          {/* EXPERIENCED FIELDS */}
+          {/* EXPERIENCED ONLY */}
           {formData.applicantType === "Experienced" && (
             <>
               <label>
@@ -415,8 +405,8 @@ function FormPage() {
                       type="radio"
                       name="placementIncharge"
                       value={option}
-                      required
                       checked={formData.placementIncharge === option}
+                      required
                       onChange={handleChange}
                     />{" "}
                     {option}
@@ -426,7 +416,7 @@ function FormPage() {
             </>
           )}
 
-          {/* Resume */}
+          {/* RESUME */}
           <label>
             Upload Resume (PDF) *
 
@@ -434,9 +424,7 @@ function FormPage() {
               <p>
                 📄 Existing Resume:{" "}
                 <a
-                  href={`${process.env.REACT_APP_API_URL}/api/resume/view/${encodeURIComponent(
-                formData.fileKey
-              )}`}
+                  href={`${API_BASE}/api/resume/view/${encodeURIComponent(formData.fileKey)}`}
                   target="_blank"
                   rel="noopener noreferrer"
                 >
