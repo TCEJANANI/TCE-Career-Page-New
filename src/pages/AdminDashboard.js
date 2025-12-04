@@ -21,7 +21,7 @@ import SubmissionModal from "./SubmissionModal";
 
 import "./AdminDashboard.css";
 
-const API_BASE = "http://localhost:5007/api/applications";
+const API_BASE = "https://tce-careerpage-cuml.onrender.com/api/applications";
 
 export default function AdminDashboard() {
   const navigate = useNavigate();

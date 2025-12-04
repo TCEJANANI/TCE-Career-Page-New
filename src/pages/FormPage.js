@@ -52,9 +52,11 @@ function FormPage() {
     if (!formData.email) return;
 
     try {
-      const res = await fetch(
-        `http://localhost:5007/api/applications/by-email/${formData.email}`
-      );
+      const res = await fetch(`${process.env.REACT_APP_API_URL}/api/applications`, {
+  method: "POST",
+  body: formData
+});
+
 
       if (res.ok) {
         const data = await res.json();
@@ -121,7 +123,7 @@ function FormPage() {
       // UPDATE ---------------------------------
       if (formData.id) {
         response = await fetch(
-          `http://localhost:5007/api/applications/id/${formData.id}`,
+          `${process.env.REACT_APP_API_URL}/api/applications/id/${formData.id}`,
           {
             method: "PUT",
             body: formPayload
@@ -130,7 +132,7 @@ function FormPage() {
       }
       // INSERT ---------------------------------
       else {
-        response = await fetch("http://localhost:5007/api/applications", {
+        response = await fetch(`${process.env.REACT_APP_API_URL}/api/applications`, {
           method: "POST",
           body: formPayload
         });
@@ -432,7 +434,9 @@ function FormPage() {
               <p>
                 📄 Existing Resume:{" "}
                 <a
-                  href={`http://localhost:5007/api/resume/view/${encodeURIComponent(formData.fileKey)}`}
+                  href={`${process.env.REACT_APP_API_URL}/api/resume/view/${encodeURIComponent(
+                formData.fileKey
+              )}`}
                   target="_blank"
                   rel="noopener noreferrer"
                 >
