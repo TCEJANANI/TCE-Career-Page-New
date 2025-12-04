@@ -14,8 +14,15 @@ const { getSignedUrl } = require("@aws-sdk/s3-request-presigner");
 const JSZip = require("jszip");
 
 const app = express();
-app.use(cors());
+
 app.use(express.json());
+app.use(cors({
+  origin: "https://tce-career-page-new.onrender.com", // frontend origin
+  methods: ["GET", "POST", "PUT", "DELETE"],
+  allowedHeaders: ["Content-Type", "Authorization"],
+  credentials: true
+}));
+
 
 // -----------------------------
 // MYSQL CONNECTION
@@ -40,7 +47,7 @@ db.connect((err) => {
 // B2 S3 CLIENT
 // -----------------------------
 const s3 = new S3Client({
-  region: "us-east-005",
+  region: process.env.B2_REGION || "us-east-005",
   endpoint: `https://${process.env.B2_ENDPOINT}`,
   credentials: {
     accessKeyId: process.env.B2_KEY_ID,
@@ -49,6 +56,7 @@ const s3 = new S3Client({
 });
 
 const upload = multer({ storage: multer.memoryStorage() });
+
 
 // -----------------------------
 // Generate Sequential Application ID
@@ -130,6 +138,10 @@ const ALLOWED_FIELDS = [
 // -----------------------------
 // ROUTE 1 — INSERT APPLICATION
 // -----------------------------
+
+app.get( "/", ( req, res ) => res.send( "Career Page API is running" ) );
+
+
 app.post("/api/applications", upload.single("file"), async (req, res) => {
   try {
     const applicationId = await generateApplicationId();
